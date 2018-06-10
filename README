@@ -1,2 +1,3 @@
 Some visual simulations of different micro-architectures (pipelined architecture, microcded architecture) for different RISC-like instruction set architectures (such as RISC-V, maybe also DLX.)
 
+The goal is to be something like Escape (https://users.elis.ugent.be/escape/), but much more flexible and extensible.
