@@ -1,6 +1,3 @@
-class ALU:
-  pass
-
 class RegisterFile:
   pass
 
