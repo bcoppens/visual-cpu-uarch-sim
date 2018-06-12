@@ -19,7 +19,7 @@ class Opcode(Enum): # RV32I for now
 
   SYSTEM  = 39
 
-class Instruction(Enum): # RV32I for now
+class InstructionType(Enum): # RV32I for now
   LUI     = 0
   AUIPC   = 1
   JAL     = 2
@@ -68,6 +68,64 @@ class Instruction(Enum): # RV32I for now
   CSRRSI  = 45
   CSRRCI  = 46
 
+class Instruction:
+  def __init__(self, opcode, type):
+    self.opcode = opcode
+    self.type = type
+  def __str__(self):
+    return str(self.type)
+
+class LUI(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.LUI, InstructionType.LUI)
+
+class AUIPC(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.AUIPC, InstructionType.AUIPC)
+
+class JAL(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.JAL, InstructionType.JAL)
+
+class JALR(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.JALR, InstructionType.JALR)
+
+class BRANCH(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.BRANCH, None)
+
+class LOAD(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.LOAD, None)
+
+class STORE(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.STORE, None)
+
+class OP_IMM(Instruction):
+  def __init__(self, type, rd, rs1, imm):
+    super().__init__(Opcode.OP_IMM, type)
+    self.rd = rd
+    self.rs1 = rs1
+    self.imm = imm
+
+  def __str__(self):
+    return "%s r%s, r%s, %s"  % (self.type, self.rd, self.rs1, self.imm)
+
+class OP(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.OP, None)
+
+class MISCMEM(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.MISCMEM, None)
+
+class SYSTEM(Instruction):
+  def __init__(self):
+    super().__init__(Opcode.SYSTEM, None)
+
+
 def get_opcode(bits):
   opcodes = {
     0b0110111: Opcode.LUI,
@@ -85,46 +143,67 @@ def get_opcode(bits):
 
   opcode_bits = bits & 0b1111111
   
-  print (bin(opcode_bits))
-
   return opcodes[opcode_bits]
 
 def get_rd(bits):
-  return (bits >> 7) & 0b1111
+  return (bits >> 7) & 0b11111
+
+def get_func3(bits):
+  return (bits >> 12) & 0b111
+
+def get_rs1(bits):
+  return (bits >> 15) & 0b11111
+
+def get_rs2(bits):
+  return (bits >> 20) & 0b11111
 
 def decode_lui(bits):
-  pass
+  return LUI()
 
 def decode_auipc(bits):
-  pass
+  return AUIPC()
 
 def decode_jal(bits):
-  pass
+  return JAL()
 
 def decode_jalr(bits):
-  pass
+  return JALR()
 
 def decode_branch(bits):
-  pass
+  return BRANCH()
 
 def decode_load(bits):
-  pass
+  return LOAD()
 
 def decode_store(bits):
-  pass
+  return STORE()
 
 def decode_op_imm(bits):
-  pass
+  types = {
+    0b000: InstructionType.ADDI,
+    0b010: InstructionType.SLTI,
+    0b011: InstructionType.SLTIU,
+    0b100: InstructionType.XORI,
+    0b110: InstructionType.ORI,
+    0b111: InstructionType.ANDI,
+    0b001: InstructionType.SLLI,
+    0b101: InstructionType.SRLI,
+    0b101: InstructionType.SRAI
+  }
+
+  type = types[get_func3(bits)]
+  imm = (bits >> 20) & 0b111111111111
+
+  return OP_IMM( type, get_rd(bits), get_rs1(bits), imm )
 
 def decode_op(bits):
-  print("OP")
-  pass
+  return OP()
 
 def decode_miscmem(bits):
-  pass
+  return MISCMEM()
 
 def decode_system(bits):
-  pass
+  return SYSTEM()
 
 def decode(bits):
   opcode = get_opcode(bits)
@@ -143,6 +222,6 @@ def decode(bits):
     Opcode.SYSTEM: decode_system
   }
 
-  decoders[opcode](bits)
+  #print(opcode)
 
-decode(0b00000000010000100000010110011)
+  return decoders[opcode](bits)

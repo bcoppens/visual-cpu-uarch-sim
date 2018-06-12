@@ -26,4 +26,4 @@ f = [
 
 for i in f:
   inst = decode(i)
-  print (inst)
+  print (str(inst))
