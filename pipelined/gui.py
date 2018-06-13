@@ -17,33 +17,66 @@ from PyQt5.QtWidgets import (QApplication, QGraphicsItem, QGraphicsObject,
         QGraphicsScene, QGraphicsView)
 
 class Mux(QGraphicsItem):
-    def __init__(self):
+    def __init__(self, incoming):
         super().__init__()
 
         self.color = QColor(0, 0, 255)
+        self.incoming = incoming
+        self._height = 20 + self.incoming * 10
+        self._width = 10
 
     def boundingRect(self):
-        return QRectF(0, 0, 10, 20)
+        return QRectF(0, 0, self._width, self._height)
 
     def paint(self, painter, option, widget):
         painter.setPen(QPen(Qt.black, 1))
         painter.setBrush(QBrush(self.color))
-        painter.drawPolygon(QPolygonF([QPointF(0,0), QPointF(10,5), QPointF(10,15), QPointF(0,20)]))
+        painter.drawPolygon(QPolygonF([QPointF(0,0), QPointF(self._width,10), QPointF(self._width, self._height - 10), QPointF(0,self._height)]))
+
+class ALU(QGraphicsItem):
+    def __init__(self):
+        super().__init__()
+
+        self.color = QColor(150, 150, 150)
+
+    def boundingRect(self):
+        return QRectF(0, 0, 10, 30)
+
+    def paint(self, painter, option, widget):
+        painter.setPen(QPen(Qt.black, 1))
+        painter.setBrush(QBrush(self.color))
+        painter.drawPolygon(QPolygonF([QPointF(0,0),
+                                       QPointF(10,10),
+                                       QPointF(10,20),
+                                       QPointF(0,30),
+                                       QPointF(0,20),
+                                       QPointF(3.5,15),
+                                       QPointF(0,10)]))
 
 
 if __name__ == '__main__':
     
     app = QApplication(sys.argv)
 
-    scene = QGraphicsScene(-200, -200, 400, 400)
+    scene = QGraphicsScene(-50, -50, 400, 400)
 
-    mux = Mux()
-    mux.setPos(0, 0)
-    scene.addItem(mux)
+    mux_s1 = Mux(4)
+    mux_s1.setPos(0, 0)
+    scene.addItem(mux_s1)
+
+    mux_s2 = Mux(4)
+    mux_s2.setPos(0, mux_s2._height + 20)
+    scene.addItem(mux_s2)
+
+    alu = ALU()
+    alu.setPos(mux_s2.pos() + QPointF(mux_s2._width + 40, 0))
+    alu.setScale(4)
+    scene.addItem(alu)
 
     view = QGraphicsView(scene)
     view.setRenderHint(QPainter.Antialiasing)
     view.setViewportUpdateMode(QGraphicsView.BoundingRectViewportUpdate)
+    view.scale(2, 2)
     view.setBackgroundBrush(QColor(230, 200, 167))
     view.setWindowTitle("Pipelined Microarchitecture")
     view.show()
