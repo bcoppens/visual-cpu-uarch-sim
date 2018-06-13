@@ -43,7 +43,9 @@ class ALU(QGraphicsItem):
         return QRectF(0, 0, 10, 30)
 
     def paint(self, painter, option, widget):
-        painter.setPen(QPen(Qt.black, 1))
+        pen = QPen(Qt.black, 2)
+        pen.setCosmetic(True)
+        painter.setPen(pen)
         painter.setBrush(QBrush(self.color))
         painter.drawPolygon(QPolygonF([QPointF(0,0),
                                        QPointF(10,10),
