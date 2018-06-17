@@ -24,3 +24,11 @@ class ALU:
     self.S2 = S2
     self.operation = None
     self.output = None
+
+  def result(self):
+    if   self.operation == Operation.ADD:
+      return self.S1.result() + self.S2.result()
+    elif self.operation == Operation.SUB:
+      return self.S1.result() - self.S2.result()
+    else:
+      assert False

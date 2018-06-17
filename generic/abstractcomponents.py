@@ -10,6 +10,11 @@ class Mux:
     self.selector = selector
     self.output = None
 
+  def result(self):
+    assert self.selector.result() < len(self.inputs)
+
+    return self.inputs[self.selector.result()]
+
 class Adder:
   pass
 
