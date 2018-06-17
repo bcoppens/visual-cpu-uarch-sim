@@ -16,14 +16,20 @@ from PyQt5.QtGui import (QBrush, QColor, QDrag, QImage, QPainter, QPen,
 from PyQt5.QtWidgets import (QApplication, QGraphicsItem, QGraphicsObject,
         QGraphicsScene, QGraphicsView)
 
+import generic
+
 class Mux(QGraphicsItem):
-    def __init__(self, incoming):
+    def __init__(self):
         super().__init__()
 
         self.color = QColor(0, 0, 255)
+        self._width = 10
+
+        self.setIncoming(0)
+
+    def setIncoming(self, incoming):
         self.incoming = incoming
         self._height = 20 + self.incoming * 10
-        self._width = 10
 
     def boundingRect(self):
         return QRectF(0, 0, self._width, self._height)
@@ -54,19 +60,30 @@ class ALU(QGraphicsItem):
                                        QPointF(0,20),
                                        QPointF(3.5,15),
                                        QPointF(0,10)]))
+viewMap = {
+  generic.abstractcomponents.Mux: Mux,
+  generic.ALU.ALU: ALU
+}
 
+def mapModelsToViews(models):
+  modelsToViews = {}
+  for m in models:
+    modelsToViews[m] = viewMap[m.__class__]()
 
-if __name__ == '__main__':
-    
+  return modelsToViews
+
+def GUI():
     app = QApplication(sys.argv)
 
     scene = QGraphicsScene(-50, -50, 400, 400)
 
-    mux_s1 = Mux(4)
+    mux_s1 = Mux()
+    mux_s1.setIncoming(4)
     mux_s1.setPos(0, 0)
     scene.addItem(mux_s1)
 
-    mux_s2 = Mux(4)
+    mux_s2 = Mux()
+    mux_s2.setIncoming(4)
     mux_s2.setPos(0, mux_s2._height + 20)
     scene.addItem(mux_s2)
 

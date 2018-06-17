@@ -19,4 +19,8 @@ class Operation(Enum):
   S2S1 = 13 # returns ( S2[15:0] << 16 ) | S1[15:0]
 
 class ALU:
-  pass
+  def __init__(self, S1, S2):
+    self.S1 = S1
+    self.S2 = S2
+    self.operation = None
+    self.output = None
